@@ -17,6 +17,7 @@
   "environment": "*",
   "entrypoints": {
     "main": [
+      "it.bisumto.carpetschool.CarpetSchool"
     ]
   },
   "mixins": [

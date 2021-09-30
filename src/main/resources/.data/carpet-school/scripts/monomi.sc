@@ -1,0 +1,1 @@
+__on_tick() -> print(player('all'),'Hello world!');

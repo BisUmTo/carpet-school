@@ -1,8 +1,9 @@
 {
   "required": true,
-  "package": "carpet_extension.mixins",
+  "package": "it.bisumto.carpetschool.mixins",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
+    "ServerPlayerEntityMixin"
   ],
   "client": [
   ],
