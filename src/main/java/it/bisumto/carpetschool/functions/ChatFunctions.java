@@ -8,19 +8,11 @@ import carpet.script.value.FormattedTextValue;
 import carpet.script.value.NumericValue;
 import carpet.script.value.StringValue;
 import carpet.script.value.Value;
-import net.minecraft.command.CommandSource;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.server.command.TellRawCommand;
 import net.minecraft.stat.ServerStatHandler;
 import net.minecraft.stat.Stat;
 import net.minecraft.stat.StatType;
-import net.minecraft.text.Style;
 import net.minecraft.text.Text;
-import net.minecraft.text.Texts;
 import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.InvalidIdentifierException;
 import net.minecraft.util.WorldSavePath;
@@ -29,24 +21,23 @@ import net.minecraft.util.registry.Registry;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ChatFunctions {
     public static void apply(Expression expression) {
         // unicode(number)
-        expression.addLazyFunction("unicode", 1,  (c, t, lv) -> {
+        expression.addLazyFunction("unicode", 1, (c, t, lv) -> {
             long code = lv.get(0).evalValue(c).readInteger();
-            return (_c, _t) -> new StringValue("" + (char)code);
+            return (_c, _t) -> new StringValue("" + (char) code);
         });
 
         // translate(id, args)
-        expression.addLazyFunction("translate", -1,  (c, t, lv) -> {
-            if ( lv.size() < 1 )
+        expression.addLazyFunction("translate", -1, (c, t, lv) -> {
+            if (lv.size() < 1)
                 throw new InternalExpressionException("'translate' statement needs to have at least the translation id");
             String key = lv.get(0).evalValue(c).getString();
             List<String> lstring;
             if (lv.size() > 1)
-                lstring = lv.subList(1,lv.size()-1).stream().map(l -> l.evalValue(c).getString()).toList();
+                lstring = lv.subList(1, lv.size() - 1).stream().map(l -> l.evalValue(c).getString()).toList();
             else
                 lstring = new ArrayList<>();
             Text text = new TranslatableText(key, lstring.toArray());
@@ -54,18 +45,12 @@ public class ChatFunctions {
         });
 
         // icon(id)
-        expression.addLazyFunction("icon", 1,  (c, t, lv) -> {
-            Identifier id = new Identifier(lv.get(0).evalValue(c).getString());
-            Item item = Registry.ITEM.get(id);
-            String key = "";
-            if (Items.AIR != item){
-                key += "tryashtar.shulker_preview.";
-                key += item instanceof BlockItem ? "block." : "item.";
-                key += id.getPath();
-                key += ".0";
-            }
-            Text text = new TranslatableText(key).styled(
-                    style -> style.withFont(new Identifier("tryashtar.shulker_preview:test"))
+        expression.addLazyFunction("icon", 1, (c, t, lv) -> {
+            Value keyValue = lv.get(0).evalValue(c);
+            String key = keyValue.isNull() ? "empty_slot" : keyValue.getString();
+
+            Text text = new TranslatableText("carpet-school." + key).styled(
+                    style -> style.withFont(new Identifier("carpet-school:icon"))
             );
             return (_c, _t) -> new FormattedTextValue(text);
         });
