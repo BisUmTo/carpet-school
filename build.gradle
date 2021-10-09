@@ -33,6 +33,7 @@ dependencies {
 	apiModules.each {
 		modApi include(fabricApi.module(it, project.fabric_version))
 	}
+
 	// PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
 	// You may need to force-disable transitiveness on them.
 }

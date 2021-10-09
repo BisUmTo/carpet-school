@@ -13,6 +13,7 @@ import static it.bisumto.carpetschool.events.CarpetSchoolEvents.PLAYER_DROPS_ITE
 
 @Mixin(ServerPlayerEntity.class)
 public class ServerPlayerEntityMixin {
+    // __on_player_drops_item_after() handler
     @Inject(method = "dropItem(Lnet/minecraft/item/ItemStack;ZZ)Lnet/minecraft/entity/ItemEntity;",
             at = @At(value = "RETURN", ordinal = 1),
             locals = LocalCapture.CAPTURE_FAILHARD)

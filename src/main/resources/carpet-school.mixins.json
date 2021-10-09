@@ -3,6 +3,7 @@
   "package": "it.bisumto.carpetschool.mixins",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
+    "MinecraftClientAccessor",
     "ServerPlayerEntityMixin"
   ],
   "client": [
