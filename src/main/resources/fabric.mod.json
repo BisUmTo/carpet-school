@@ -31,5 +31,6 @@
   },
   "suggests": {
     "flamingo": "*"
-  }
+  },
+  "accessWidener": "carpet-school.accesswidener"
 }

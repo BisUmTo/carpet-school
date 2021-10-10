@@ -23,6 +23,8 @@ public class Config {
     public boolean ONLINECHAT;
     @SerializedName("commands")
     public boolean COMMANDS;
+    @SerializedName("schoolname")
+    public String SCHOOLNAME;
 
     public Config() {
         // Hier die Standardwerte falls das jeweiligen Attribut nicht in der
@@ -30,6 +32,7 @@ public class Config {
         this.MULTIPLAYER = false;
         this.ONLINECHAT = false;
         this.COMMANDS = false;
+        this.SCHOOLNAME = "Castello delle Idee 2021 - Juvenes";
     }
 
     public static Config getInstance() {

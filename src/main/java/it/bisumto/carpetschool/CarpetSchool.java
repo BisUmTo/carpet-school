@@ -2,7 +2,6 @@ package it.bisumto.carpetschool;
 
 import carpet.CarpetExtension;
 import carpet.CarpetServer;
-import carpet.network.CarpetClient;
 import carpet.script.CarpetExpression;
 import carpet.script.CarpetScriptServer;
 import carpet.script.bundled.BundledModule;
@@ -42,8 +41,15 @@ public class CarpetSchool implements CarpetExtension, ModInitializer {
     @Override
     public void onGameStarted() {
         CarpetServer.settingsManager.parseSettingsClass(CarpetSchoolRules.class);
+        CarpetServer.settingsManager.getRule("commandScript").set(null, "ops");
+
         CarpetScriptServer.registerSettingsApp(defaultScript("monomi", false));
         CarpetScriptServer.registerSettingsApp(defaultScript("frazioni", false));
+    }
+
+    @Override
+    public void onServerLoaded(MinecraftServer server) {
+        reloadConfig();
     }
 
     private static BundledModule defaultScript(String scriptName, boolean isLibrary) {
@@ -72,7 +78,7 @@ public class CarpetSchool implements CarpetExtension, ModInitializer {
         reloadConfig();
     }
 
-    void reloadConfig(){
+    public static void reloadConfig(){
         try {
             Path configDir = FabricLoader.getInstance().getConfigDir().normalize();
             Files.createDirectories(configDir);

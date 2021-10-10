@@ -14,9 +14,7 @@ global_countdown = world_time()-global_time;
 global_domanda = 0;
 global_n_risposta_corretta = null;
 global_lettere = ['a)','b)','c)'];
-global_entity = null;
 global_item = null;
-global_premio = null;
 
 // UTILS
 _remove_match(l, match) -> (
@@ -48,6 +46,12 @@ _n_inventory_list(inv) -> (
     for(_inventory_list(inv), if(_, il += _));
     il
 );
+_mcd(a,b) -> (
+    while(b != 0, 127,
+        [a, b] = [b, a % b];
+    );
+    a
+);
 
 // ITEM POOL
 global_item_pool = _remove_match(item_list(), '_spawn_egg$');
@@ -55,68 +59,38 @@ delete(global_item_pool, 0);
 delete(global_item_pool, global_item_pool~'enchanted_golden_apple');
 delete(global_item_pool, global_item_pool~'debug_stick');
 
-// STAMPA POLINOMIO
-_polinomio(p) ->
-reduce(
-    p,
-    // SEGNO
-    if(_i || _:0 < 0,
-        _a += if(_:0 < 0, '- ', '+ ')
-    );
-    // NUMERICA
-    _a += abs(_:0);
-    _a += ' ';
-    // LETTERALE
-    _a += icon(_:1);
-    _a += ' ',
-    ''
+// STAMPA PROPORZIONE
+_proporzione(p) -> _incognita(p:0) + ' : ' + _incognita(p:1) + ' = ' _incognita(p:2) + ' : ' + _incognita(p:3);
+_s_proporzione(p) -> _proporzione(
+    t = if(rand(2), p, [p:3,p:2,p:1,p:0]);
+    t = if(rand(2), t, [t:1,t:0,t:3,t:2]);
 );
-_r_polinomio(p) ->
-reduce(
-    p,
-    if(_:0 == 0,
-        _a
-    , // else
-        // SEGNO
-        if(_i || _:0 < 0,
-            _a += if(_:0 < 0, '- ', '+ ')
-        );
-        // NUMERICA
-        _a += abs(_:0);
-        _a += ' ';
-        // LETTERALE
-        _a += icon(_:1);
-        _a += ' '
-    ),
-    ''
-);
-_s_polinomio(p) -> _polinomio(_shuffle(p));
-_s_r_polinomio(p) -> _r_polinomio(_shuffle(p));
+_icognita(i) -> if(i!=null, i, '?');
 
-// OPERAZIONI POLINOMI
-_riduci(p) -> (
-    dic = {};
-    for(p,
-        dic:(_:1) += _:0
-    );
-    map(keys(dic),
-        [dic:_, _]
-    )
+// OPERAZIONI PROPORZIONI
+_per(k, p) -> _perL(k, _perR(k, p));
+_perL(k, p) -> (
+    p:0 *= k;
+    p:1 *= k;
+    p
 );
-_somma(p1, p2) -> [...p1, ...p2];
-_r_somma(p1, p2) -> riduci(_somma(p1, p2));
-_sottrazione(p1, p2) -> _somma(p1, _opposto(p2));
-_r_sottrazione(p1, p2) -> riduci(_sottrazione(p1, p2));
-_per(k, p) -> map(p, [k * _:0, _:1]);
-_opposto(p) -> _per(-1, p);
-
-// OPERAZIONI SPECIALI POLINOMI
-_add_rand_item(p1, max_count) ->
-p1 += (
-    global_premio = [
-        floor(rand(max_count))+1,
-        rand(global_item_pool)
-    ]
+_perR(k, p) -> (
+    p:2 *= k;
+    p:3 *= k;
+    p
+);
+_semplifica(p) -> _semplificaL(_semplificaR(p));
+_semplificaL(p) -> (
+    mcd = max(1, _mcd(p:0, p:1));
+    p:0 /= mcd;
+    p:1 /= mcd;
+    p
+);
+_semplificaL(p) -> (
+    mcd = max(1, _mcd(p:2, p:3));
+    p:2 /= mcd;
+    p:3 /= mcd;
+    p
 );
 
 // DOMANDA RISPOSTA
@@ -140,30 +114,27 @@ _casuale() -> (
 _domanda() -> (
     _freeze();
     print('=====================================================');
-    print(format('b#ff0000 MATEMATICA CON MINECRAFT') +  ' #1.' + (global_domanda+=1));
+    print(format('b#ff0000 MATEMATICA CON MINECRAFT') +  ' #2.' + (global_domanda+=1));
     print(format('i Rispondi correttamente per ricevere un premio!\n'));
 
-    polinomio = _casuale();
-    //print(polinomio);
-    print(_s_polinomio(polinomio) + '=\n');
+    // TODO:
+    // polinomio = _casuale();
+    // //print(polinomio);
+    // print(_s_polinomio(polinomio) + '=\n');
 
+    // r1 = _riduci(polinomio);
+    // r2 = copy(r1);
+    // r3 = copy(r1);
+    // r2:(rand(length(r2))):0 += if(!rand(6),-1,1)*(floor(rand(10))+1);
+    // r3:(rand(length(r2))):0 += if(!rand(6),-1,1)*(floor(rand(10))+1);
 
-    r1 = _riduci(polinomio);
-    r2 = copy(r1);
-    r3 = copy(r1);
-    r2:(rand(length(r2))):0 += if(!rand(6),-1,1)*(floor(rand(10))+1);
-    r3:(rand(length(r2))):0 += if(!rand(6),-1,1)*(floor(rand(10))+1);
     possibili_risposte = [r1,r2,r3];
     risposte_disordinate = _c_shuffle(possibili_risposte);
     global_risposta_corretta = possibili_risposte:0;
     global_n_risposta_corretta = risposte_disordinate~global_risposta_corretta;
 
     for(risposte_disordinate,
-        if(rand(2),
-            print(format(' ' + global_lettere:_i, '!/frazioni '+_i)+' '+_s_polinomio(_)+format('!/frazioni '+_i)),
-        // else
-            print(format(' ' + global_lettere:_i , '!/frazioni '+_i)+' '+_s_r_polinomio(_)+format('!/frazioni '+_i))
-        )
+        print(format(' ' + global_lettere:_i, '!/frazioni '+_i)+' '+format(' '+_,'!/frazioni '+_i)),
     );
     print('=====================================================');
     global_countdown = world_time();
@@ -175,14 +146,14 @@ _risposta(risp) -> (
             // CORRETTA
             particle('happy_villager', pos(p)+[0,p~'eye_height',0]+p~'look');
             print(format('#00ff00 Esattamente! Ecco a te il tuo premio!'));
-            if(global_premio,
-                spawn('item',pos(p),parse_nbt({'Item'->{'id'->global_premio:1,'Count'->global_premio:0}}));
+            if(global_item,
+                spawn('item',pos(p),parse_nbt({'Item'->{'id'->global_item:1,'Count'->global_item:0}}));
             );
         ,   // SBAGLIATA
             particle('wax_on', pos(p)+[0,p~'eye_height',0]+p~'look');
             print(format('#ffdd00 Accidenti! La risposta corretta era la '+global_lettere:global_n_risposta_corretta));
-            if(global_entity,
-                modify(global_entity, 'remove');
+            if(global_item,
+                run(str('/clear %s %s %d', player(), global_item:1, global_item:0));
             );
         );
         global_n_risposta_corretta = null;
@@ -200,21 +171,8 @@ _unfreeze() -> (
 _unfreeze();
 
 // EVENTI
-__on_player_collides_with_entity(player, item_entity) ->
-if(item_entity ~ 'pickup_delay' == 0,
-    item_tuple = item_entity ~ 'item';
-    [item, count, nbt] = item_tuple;
-
-    global_entity = item_entity;
+__on_statistic(player, category, item, count) ->
+if(category == 'crafted',
     global_item = [count, item];
-    if(world_time()-global_countdown > global_time, _domanda());
-);
-
-__on_player_drops_item_after(player, item_entity) -> (
-    item_tuple = item_entity ~ 'item';
-    [item, count, nbt] = item_tuple;
-
-    global_entity = item_entity;
-    global_item = [-count, item];
     if(world_time()-global_countdown > global_time, _domanda());
 );

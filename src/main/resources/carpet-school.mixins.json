@@ -3,8 +3,12 @@
   "package": "it.bisumto.carpetschool.mixins",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
+    "CreateWorldScreenMixin",
+    "GameMenuScreenMixin",
     "MinecraftClientAccessor",
-    "ServerPlayerEntityMixin"
+    "PackScreenMixin",
+    "ServerPlayerEntityMixin",
+    "TitleScreenMixin"
   ],
   "client": [
   ],
