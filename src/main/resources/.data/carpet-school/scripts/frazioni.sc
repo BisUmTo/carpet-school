@@ -60,7 +60,7 @@ delete(global_item_pool, global_item_pool~'enchanted_golden_apple');
 delete(global_item_pool, global_item_pool~'debug_stick');
 
 // STAMPA PROPORZIONE
-_proporzione(p) -> _incognita(p:0) + ' : ' + _incognita(p:1) + ' = ' _incognita(p:2) + ' : ' + _incognita(p:3);
+_proporzione(p) -> _incognita(p:0) + ' : ' + _incognita(p:1) + ' = ' + _incognita(p:2) + ' : ' + _incognita(p:3);
 _s_proporzione(p) -> _proporzione(
     t = if(rand(2), p, [p:3,p:2,p:1,p:0]);
     t = if(rand(2), t, [t:1,t:0,t:3,t:2]);
@@ -70,26 +70,26 @@ _icognita(i) -> if(i!=null, i, '?');
 // OPERAZIONI PROPORZIONI
 _per(k, p) -> _perL(k, _perR(k, p));
 _perL(k, p) -> (
-    p:0 *= k;
-    p:1 *= k;
+    p:0 = p:0 * k;
+    p:1 = p:1 * k;
     p
 );
 _perR(k, p) -> (
-    p:2 *= k;
-    p:3 *= k;
+    p:2 = p:2 * k;
+    p:3 = p:3 * k;
     p
 );
 _semplifica(p) -> _semplificaL(_semplificaR(p));
 _semplificaL(p) -> (
     mcd = max(1, _mcd(p:0, p:1));
-    p:0 /= mcd;
-    p:1 /= mcd;
+    p:0 = p:0 / mcd;
+    p:1 = p:1 / mcd;
     p
 );
 _semplificaL(p) -> (
     mcd = max(1, _mcd(p:2, p:3));
-    p:2 /= mcd;
-    p:3 /= mcd;
+    p:2 = p:2 / mcd;
+    p:3 = p:3 / mcd;
     p
 );
 
