@@ -23,6 +23,8 @@ public class Config {
     public boolean ONLINECHAT;
     @SerializedName("commands")
     public boolean COMMANDS;
+    @SerializedName("spectatorwheel")
+    public boolean SPECTATORWHEEL;
     @SerializedName("schoolname")
     public String SCHOOLNAME;
 
@@ -33,6 +35,7 @@ public class Config {
         this.ONLINECHAT = false;
         this.COMMANDS = false;
         this.SCHOOLNAME = "Castello delle Idee 2021 - Juvenes";
+        this.SPECTATORWHEEL = false;
     }
 
     public static Config getInstance() {

@@ -6,6 +6,7 @@
     "CreateWorldScreenMixin",
     "GameMenuScreenMixin",
     "MinecraftClientAccessor",
+    "MouseMixin",
     "PackScreenMixin",
     "ServerPlayerEntityMixin",
     "TitleScreenMixin"

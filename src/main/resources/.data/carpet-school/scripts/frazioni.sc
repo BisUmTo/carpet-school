@@ -65,7 +65,7 @@ _s_proporzione(p) -> _proporzione(
     t = if(rand(2), p, [p:3,p:2,p:1,p:0]);
     t = if(rand(2), t, [t:1,t:0,t:3,t:2]);
 );
-_icognita(i) -> if(i!=null, i, '?');
+_incognita(i) -> if(i!=null, str(i), '?');
 
 // OPERAZIONI PROPORZIONI
 _per(k, p) -> _perL(k, _perR(k, p));
@@ -94,21 +94,21 @@ _semplificaL(p) -> (
 );
 
 // DOMANDA RISPOSTA
+global_primi = [1,2,3,5,7,11,13,17,19,23];
 _casuale() -> (
-    random_item = [if(!rand(6),-1,1)*(floor(rand(10))+1), global_item:1];
-    polinomio = [global_item, random_item];
-    loop(rand(2)+1,
-        _add_rand_item(polinomio, if(!rand(6),-1,1)*(floor(rand(10))+1))
+    rapporto = rand(global_primi);
+    b1 = floor(rand(8))+1;
+    b2 = floor(rand(8))+1;
+    if(b1 == b2, b1 += if(!rand(2),-1,1)*(floor(rand(10))+1));
+    if(b1 == 0, b1 += if(!rand(2),-1,1)*(floor(rand(10))+1));
+    f = [b1, b1*rapporto, b2, b2*rapporto];
+    if(b1*rapporto < 50,
+        f = _perL(floor(rand(5)+1), f);
     );
-    inv = _n_inventory_list(player());
-    if(inv,
-        loop(rand(2)+1,
-            item = rand(inv);
-            monomio = [item:1, item:0];
-            polinomio += monomio
-        );
+    if(b2*rapporto < 50,
+        f = _perR(floor(rand(5)+1), f);
     );
-    polinomio
+    f
 );
 
 _domanda() -> (
@@ -117,24 +117,43 @@ _domanda() -> (
     print(format('b#ff0000 MATEMATICA CON MINECRAFT') +  ' #2.' + (global_domanda+=1));
     print(format('i Rispondi correttamente per ricevere un premio!\n'));
 
-    // TODO:
-    // polinomio = _casuale();
-    // //print(polinomio);
-    // print(_s_polinomio(polinomio) + '=\n');
+    proporzione = _casuale();
+    index = floor(rand(4));
+    global_risposta_corretta = proporzione:index;
+    proporzione:index = null;
+    print(format('b ' + _s_proporzione(proporzione)));
 
-    // r1 = _riduci(polinomio);
-    // r2 = copy(r1);
-    // r3 = copy(r1);
-    // r2:(rand(length(r2))):0 += if(!rand(6),-1,1)*(floor(rand(10))+1);
-    // r3:(rand(length(r2))):0 += if(!rand(6),-1,1)*(floor(rand(10))+1);
+    if(index == 0,
+        r1 = proporzione:1 * proporzione:3 / proporzione:2;
+        r2 = proporzione:2 * proporzione:3 / proporzione:1,
+       index == 1;
+        r1 = proporzione:0 * proporzione:2 / proporzione:3;
+        r2 = proporzione:2 * proporzione:3 / proporzione:0,
+       index == 2;
+        r1 = proporzione:1 * proporzione:3 / proporzione:0;
+        r2 = proporzione:0 * proporzione:1 / proporzione:3,
+       index == 3;
+        r1 = proporzione:0 * proporzione:2 / proporzione:1;
+        r1 = proporzione:0 * proporzione:1 / proporzione:2,
+    );
+    if(rand(6), r1 = (floor(rand(25))+1));
+    if(rand(6), r2 = (floor(rand(25))+1));
+    r1 = floor(r1);
+    r2 = floor(r2);
+    if(r1 == global_risposta_corretta,
+        r1 += if(!rand(2),-1,1)*(floor(rand(10))+1)
+    );
+    while(r2 == global_risposta_corretta || r2 == r1, 127,
+        r2 += if(!rand(2),-1,1)*(floor(rand(10))+1)
+    );
 
-    possibili_risposte = [r1,r2,r3];
+    possibili_risposte = [global_risposta_corretta,r1,r2];
     risposte_disordinate = _c_shuffle(possibili_risposte);
-    global_risposta_corretta = possibili_risposte:0;
+
     global_n_risposta_corretta = risposte_disordinate~global_risposta_corretta;
 
     for(risposte_disordinate,
-        print(format(' ' + global_lettere:_i, '!/frazioni '+_i)+' '+format(' '+_,'!/frazioni '+_i)),
+        print(format(' ' + global_lettere:_i, '!/frazioni '+_i)+' '+format(' ? = '+_,'!/frazioni '+_i)),
     );
     print('=====================================================');
     global_countdown = world_time();
@@ -162,11 +181,25 @@ _risposta(risp) -> (
 );
 
 // FREEZE
+global_pos = {};
+run('carpet creativeFlySpeed 0');
 _freeze() -> (
     if(run('tick freeze'):1:0~'normally',run('tick freeze'));
+    for(player('all'),
+        global_pos:_ = pos(_);
+        fly_speed(_, 0);
+        modify(_, 'gamemode', 'spectator')
+    )
 );
 _unfreeze() -> (
     if(run('tick freeze'):1:0~'frozen',run('tick freeze'));
+    for(player('all'),
+        if(global_pos:_,
+            modify(_, 'gamemode', 'survival');
+            modify(_, 'pos', global_pos:_)
+        );
+        delete(global_pos:_)
+    );
 );
 _unfreeze();
 

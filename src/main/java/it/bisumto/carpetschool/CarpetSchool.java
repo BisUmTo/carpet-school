@@ -8,6 +8,7 @@ import carpet.script.bundled.BundledModule;
 import it.bisumto.carpetschool.config.Config;
 import it.bisumto.carpetschool.events.CarpetSchoolEvents;
 import it.bisumto.carpetschool.functions.ChatFunctions;
+import it.bisumto.carpetschool.functions.FlySpeedFunctions;
 import it.bisumto.carpetschool.mixins.MinecraftClientAccessor;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
@@ -32,6 +33,7 @@ public class CarpetSchool implements CarpetExtension, ModInitializer {
     @Override
     public void scarpetApi(CarpetExpression expression) {
         ChatFunctions.apply(expression.getExpr());
+        FlySpeedFunctions.apply(expression.getExpr());
     }
 
     @Override
