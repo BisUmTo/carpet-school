@@ -16,11 +16,21 @@ public class CarpetSchoolRules {
     public static boolean EP1_MONOMI = false;
 
     @Rule(
-            desc = "...",
-            //extra = {"Se si risponde correttamente, si otterrà un oggetto extra",
-            //        "Se la risposta dovesse essere errata, si potrebbe perdere l'oggetto raccolto."},
+            desc = "Quando si crafta un oggetto, verrà mostrata una proporzione con 1 incognita.",
+            extra = {"Se si risponde correttamente, raddoppiavi il risultato.",
+                     "Se la risposta dovesse essere errata, si perderebbe il risultato."},
             appSource = "frazioni",
             category = {SURVIVAL, SCHOOL}
     )
-    public static boolean EP2_FRAZIONI = true;
+    public static boolean EP2_FRAZIONI = false;
+
+
+    @Rule(
+            desc = "Quando si cambia slot dell'inventario, viene mostrato un semplice modulo.",
+            extra = {"Se si risponde correttamente, si incanta l'oggetto con un incantesimo a caso.",
+                    "Se la risposta dovesse essere errata, si disordinerebbe l'inventario."},
+            appSource = "modulo",
+            category = {SURVIVAL, SCHOOL}
+    )
+    public static boolean EP3_MODULO = true;
 }
