@@ -19,11 +19,10 @@ public class CarpetSchoolRules {
             desc = "Quando si crafta un oggetto, verrà mostrata una proporzione con 1 incognita.",
             extra = {"Se si risponde correttamente, raddoppiavi il risultato.",
                      "Se la risposta dovesse essere errata, si perderebbe il risultato."},
-            appSource = "frazioni",
+            appSource = "proporzioni",
             category = {SURVIVAL, SCHOOL}
     )
-    public static boolean EP2_FRAZIONI = false;
-
+    public static boolean EP2_PROPORZIONI = false;
 
     @Rule(
             desc = "Quando si cambia slot dell'inventario, viene mostrato un semplice modulo.",
@@ -32,5 +31,15 @@ public class CarpetSchoolRules {
             appSource = "modulo",
             category = {SURVIVAL, SCHOOL}
     )
-    public static boolean EP3_MODULO = true;
+    public static boolean EP3_MODULO = false;
+
+
+    @Rule(
+            desc = "Quando si utilizza un utensile, viene mostrato una percentuali da risolvere.",
+            extra = {"Se si risponde correttamente, si ottiene una % di un sottoinsieme di oggetti dell'inventario.",
+                    "Se la risposta dovesse essere errata, si perde una % di un sottoinsieme di oggetti dell'inventario."},
+            appSource = "percentuali",
+            category = {SURVIVAL, SCHOOL}
+    )
+    public static boolean EP4_PERCENTUALI = false;
 }

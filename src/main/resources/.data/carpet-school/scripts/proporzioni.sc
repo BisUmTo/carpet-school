@@ -153,7 +153,7 @@ _domanda() -> (
     global_n_risposta_corretta = risposte_disordinate~global_risposta_corretta;
 
     for(risposte_disordinate,
-        print(format(' ' + global_lettere:_i, '!/frazioni '+_i)+' '+format(' ? = '+_,'!/frazioni '+_i)),
+        print(format(' ' + global_lettere:_i, '!/proporzioni '+_i)+' '+format(' ? = '+_,'!/proporzioni '+_i)),
     );
     print('=====================================================');
     global_countdown = world_time();
@@ -188,6 +188,7 @@ _freeze() -> (
     for(player('all'),
         global_pos:_ = pos(_);
         fly_speed(_, 0);
+        modify(_, 'motion', 0, 0, 0);
         modify(_, 'gamemode', 'spectator')
     )
 );
