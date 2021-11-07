@@ -49,6 +49,7 @@ public class CarpetSchool implements CarpetExtension, ModInitializer {
         CarpetScriptServer.registerSettingsApp(defaultScript("proporzioni", false));
         CarpetScriptServer.registerSettingsApp(defaultScript("modulo", false));
         CarpetScriptServer.registerSettingsApp(defaultScript("percentuali", false));
+        CarpetScriptServer.registerSettingsApp(defaultScript("basi", false));
     }
 
     @Override

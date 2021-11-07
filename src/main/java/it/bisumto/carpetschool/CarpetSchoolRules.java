@@ -33,7 +33,6 @@ public class CarpetSchoolRules {
     )
     public static boolean EP3_MODULO = false;
 
-
     @Rule(
             desc = "Quando si utilizza un utensile, viene mostrato una percentuali da risolvere.",
             extra = {"Se si risponde correttamente, si ottiene una % di un sottoinsieme di oggetti dell'inventario.",
@@ -42,4 +41,13 @@ public class CarpetSchoolRules {
             category = {SURVIVAL, SCHOOL}
     )
     public static boolean EP4_PERCENTUALI = false;
+
+    @Rule(
+            desc = "Quando si piazza un blocco, viene mostrato un esercizio di cambio basi da risolvere.",
+            extra = {"Se si risponde correttamente, si aggiungono dei blocchi allo stack corrente.",
+                    "Se la risposta dovesse essere errata, si piazzeranno tutti i blocchi dello stack corrente."},
+            appSource = "basi",
+            category = {SURVIVAL, SCHOOL}
+    )
+    public static boolean EP5_BASI = true;
 }
