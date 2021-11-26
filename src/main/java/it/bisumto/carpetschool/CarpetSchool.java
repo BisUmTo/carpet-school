@@ -27,7 +27,7 @@ import java.util.Locale;
 public class CarpetSchool implements CarpetExtension, ModInitializer {
     public static final String MOD_ID = "carpet-school";
     public static final String MOD_NAME = "Carpet School";
-    public static final String MOD_VERSION = "1.4.34";
+    public static final String MOD_VERSION = "1.4.54";
     public static final Logger LOG = LogManager.getLogger(MOD_ID);
 
     @Override
@@ -50,6 +50,7 @@ public class CarpetSchool implements CarpetExtension, ModInitializer {
         CarpetScriptServer.registerSettingsApp(defaultScript("modulo", false));
         CarpetScriptServer.registerSettingsApp(defaultScript("percentuali", false));
         CarpetScriptServer.registerSettingsApp(defaultScript("basi", false));
+        CarpetScriptServer.registerSettingsApp(defaultScript("fattoriale", false));
     }
 
     @Override

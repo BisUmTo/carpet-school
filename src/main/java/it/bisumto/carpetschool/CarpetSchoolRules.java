@@ -49,5 +49,14 @@ public class CarpetSchoolRules {
             appSource = "basi",
             category = {SURVIVAL, SCHOOL}
     )
-    public static boolean EP5_BASI = true;
+    public static boolean EP5_BASI = false;
+
+    @Rule(
+            desc = "Quando un giocatore prende danno, viene mostrata un'operazione tra fattoriali.",
+            extra = {"Se si risponde correttamente, si guadagneranno cuori pari al danno inflitto",
+                    "Se la risposta dovesse essere errata, si perderanno altrettanti cuori."},
+            appSource = "fattoriale",
+            category = {SURVIVAL, SCHOOL}
+    )
+    public static boolean EP6_FATTORIALE = true;
 }
