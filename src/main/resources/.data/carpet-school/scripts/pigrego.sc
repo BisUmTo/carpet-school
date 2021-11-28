@@ -2,7 +2,7 @@ __config() -> {
     'commands' -> {
         '<risp>' -> '_risposta',
         'skip' -> '_unfreeze',
-        'random <bool>' -> _(random) -> global_random = random
+        'decimali <bool>' -> _(bool) -> global_decimali = bool
     },
     'arguments' -> {
         'risp' -> {'type' -> 'int', 'min' -> 0, 'max' -> 2}
@@ -15,7 +15,9 @@ global_countdown = system_info('world_time')-global_time;
 global_domanda = 0;
 global_n_risposta_corretta = null;
 global_lettere = ['a)','b)','c)'];
-global_quanto = null;
+global_decimali = false;
+global_chest = null;
+global_chests = ['abandoned_mineshaft','bastion_bridge','bastion_hoglin_stable','bastion_other','bastion_treasure','buried_treasure','desert_pyramid','end_city_treasure','igloo_chest','jungle_temple','jungle_temple_dispenser','nether_bridge','pillager_outpost','ruined_portal','shipwreck_map','shipwreck_supply','shipwreck_treasure','simple_dungeon','spawn_bonus_chest','stronghold_corridor','stronghold_crossing','stronghold_library','underwater_ruin_big','underwater_ruin_small','village/village_armorer','village/village_butcher','village/village_cartographer','village/village_desert_house','village/village_fisher','village/village_fletcher','village/village_mason','village/village_plains_house','village/village_savanna_house','village/village_shepherd','village/village_snowy_house','village/village_taiga_house','village/village_tannery','village/village_temple','village/village_toolsmith','village/village_weaponsmith','woodland_mansion'];
 
 // UTILS
 _mcd(a,b) -> (
@@ -91,7 +93,94 @@ _domanda() -> (
     print(format('b#ff0000 MATEMATICA CON MINECRAFT') +  ' #7.' + (global_domanda+=1));
     print(format('i Rispondi correttamente per ricevere un premio!\n'));
 
+    raggio = if(global_decimali, (floor(rand(30))+1)/4, floor(rand(10))+1);
+    diametro = 2*raggio;
+    circonferenza = diametro + 'π';
+    area = raggio^2 + 'π';
 
+    es = floor(rand(5));
+    if(es == 0,
+        // CIRCONFERENZA
+        print(str('Se un cerchio ha raggio %s, quale è la sua circonferenza?',
+            raggio
+        ));
+        global_risposta_corretta = circonferenza;
+        if(area != circonferenza, r1 = area, r1 = diametro),
+       es == 1,
+        print(str('Se un cerchio ha diametro %s, quale è la sua circonferenza?',
+            diametro
+        ));
+        global_risposta_corretta = circonferenza;
+        if(area != circonferenza, r1 = area, r1 = raggio),
+       es == 2,
+        print(str('Se un cerchio ha area %s, quale è la sua circonferenza?',
+            area
+        ));
+        global_risposta_corretta = circonferenza;
+        r1 = diametro,
+        // DIAMETRO
+       es == 3,
+        print(str('Se un cerchio ha raggio %s, quale è il suo diametro?',
+            raggio
+        ));
+        global_risposta_corretta = diametro;
+        r1 = area,
+       es == 4,
+        print(str('Se un cerchio ha area %s, quale è il suo diametro?',
+            area
+        ));
+        global_risposta_corretta = diametro;
+        r1 = circonferenza,
+       es == 5,
+        print(str('Se un cerchio ha circonferenza %s, quale è il suo diametro?',
+            circonferenza
+        ));
+        global_risposta_corretta = diametro;
+        r1 = raggio,
+        // RAGGIO
+       es == 6,
+        print(str('Se un cerchio ha circonferenza %s, quale è il suo raggio?',
+            circonferenza
+        ));
+        global_risposta_corretta = raggio;
+        r1 = diametro,
+       es == 7,
+        print(str('Se un cerchio ha area %s, quale è il suo raggio?',
+            area
+        ));
+        global_risposta_corretta = raggio;
+        r1 = circonferenza,
+       es == 8,
+        print(str('Se un cerchio ha diametro %s, quale è il suo raggio?',
+            diametro
+        ));
+        global_risposta_corretta = raggio;
+        r1 = 2*diametro,
+        // AREA
+       es == 9,
+        print(str('Se un cerchio ha raggio %s, quale è la sua area?',
+            raggio
+        ));
+        global_risposta_corretta = area;
+        if(area != circonferenza, r1 = circonferenza, r1 = diametro),
+       es == 10,
+        print(str('Se un cerchio ha diametro %s, quale è la sua area?',
+            diametro
+        ));
+        global_risposta_corretta = area;
+        if(area != circonferenza, r1 = circonferenza, r1 = raggio),
+       es == 11,
+        print(str('Se un cerchio ha circonferenza %s, quale è la sua area?',
+            circonferenza
+        ));
+        global_risposta_corretta = area;
+        r1 = diametro,
+    );
+
+    r2 = floor(rand(100));
+    while(r2 == global_risposta_corretta || r2 == r1 || !r2, 127,
+        r2 += if(rand(2),1,-1)*floor(rand(10))
+    );
 
     possibili_risposte = [global_risposta_corretta,r1];
     if(r2 != global_risposta_corretta && r2 != r1,
@@ -115,14 +204,25 @@ _risposta(risp) -> (
             // CORRETTA
             particle('happy_villager', pos(p)+[0,p~'eye_height',0]+p~'look');
             print(format('#00ff00 Esattamente! Ecco a te il tuo premio!'));
-            // TODO
 
+            if(inventory_size(global_chest) > 0,
+                run(str('loot insert %d %d %d loot chests/%s',[
+                    ...pos(global_chest),
+                    rand(global_chests)
+                ])),
+                run(str('loot spawn %f %f %f loot chests/%s',[
+                    ...(pos(global_chest)+[0.5,1,0.5]),
+                    rand(global_chests)
+                ]))
+            );
 
         ,   // SBAGLIATA
             particle('wax_on', pos(p)+[0,p~'eye_height',0]+p~'look');
             print(format('#ffdd00 Accidenti! La risposta corretta era la '+global_lettere:global_n_risposta_corretta));
-            // TODO
 
+            run(str('execute as %s at @s in minecraft:the_nether run tp @s ~ ~ ~', p));
+            run(str('execute as %s at @s run spreadplayers ~ ~ 10 100 under 100 false @s', p));
+            global_pos:p = pos(p);
         );
         global_n_risposta_corretta = null;
     );
@@ -156,9 +256,10 @@ _unfreeze() -> (
 _unfreeze();
 
 // EVENTI
-global_blocchi = ['chest','crafting_table','furnace','blast_furnace','smoker','barrel','cartography_table'];
+global_blocchi = ['smoker','cartography_table','crafting_table','chest','furnace','blast_furnace','barrel'];
 __on_player_interacts_with_block(player, hand, block, face, hitvec) -> (
-    if(global_blocchi~block != null,
+    if(system_info('world_time')-global_countdown > global_time && global_blocchi~block != null,
+        global_chest = block;
         _domanda()
     )
 )

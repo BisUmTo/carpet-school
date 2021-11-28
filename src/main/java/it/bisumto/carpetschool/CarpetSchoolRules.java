@@ -40,7 +40,7 @@ public class CarpetSchoolRules {
             appSource = "percentuali",
             category = {SURVIVAL, SCHOOL}
     )
-    public static boolean EP4_PERCENTUALI = true;
+    public static boolean EP4_PERCENTUALI = false;
 
     @Rule(
             desc = "Quando si piazza un blocco, viene mostrato un esercizio di cambio basi da risolvere.",
@@ -62,8 +62,8 @@ public class CarpetSchoolRules {
 
     @Rule(
             desc = "Quando un giocatore apre una cassa, viene mostrata un'operazione con pi greco.",
-            extra = {"Se si risponde correttamente, droppa un'armatura \"numerata\"",
-                    "Se la risposta dovesse essere errata, ti teletrasporta in una nuova dimensione."},
+            extra = {"Se si risponde correttamente, droppa un loot casuale",
+                    "Se la risposta dovesse essere errata, ti teletrasporta a caso nel nether."},
             appSource = "pigreco",
             category = {SURVIVAL, SCHOOL}
     )

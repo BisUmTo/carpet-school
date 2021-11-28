@@ -30,34 +30,6 @@ public class CarpetSchool implements CarpetExtension, ModInitializer {
     public static final String MOD_VERSION = "1.4.54";
     public static final Logger LOG = LogManager.getLogger(MOD_ID);
 
-    @Override
-    public void scarpetApi(CarpetExpression expression) {
-        ChatFunctions.apply(expression.getExpr());
-        FlySpeedFunctions.apply(expression.getExpr());
-    }
-
-    @Override
-    public String version() {
-        return MOD_ID;
-    }
-    @Override
-    public void onGameStarted() {
-        CarpetServer.settingsManager.parseSettingsClass(CarpetSchoolRules.class);
-        CarpetServer.settingsManager.getRule("commandScript").set(null, "ops");
-
-        CarpetScriptServer.registerSettingsApp(defaultScript("monomi", false));
-        CarpetScriptServer.registerSettingsApp(defaultScript("proporzioni", false));
-        CarpetScriptServer.registerSettingsApp(defaultScript("modulo", false));
-        CarpetScriptServer.registerSettingsApp(defaultScript("percentuali", false));
-        CarpetScriptServer.registerSettingsApp(defaultScript("basi", false));
-        CarpetScriptServer.registerSettingsApp(defaultScript("fattoriale", false));
-    }
-
-    @Override
-    public void onServerLoaded(MinecraftServer server) {
-        reloadConfig();
-    }
-
     private static BundledModule defaultScript(String scriptName, boolean isLibrary) {
         BundledModule module = new BundledModule(scriptName.toLowerCase(Locale.ROOT), null, false);
         try {
@@ -71,6 +43,56 @@ public class CarpetSchool implements CarpetExtension, ModInitializer {
         return module;
     }
 
+    public static void reloadConfig() {
+        try {
+            Path configDir = FabricLoader.getInstance().getConfigDir().normalize();
+            Files.createDirectories(configDir);
+            Path configFile = configDir.resolve("carpet-school.json").normalize();
+            Config.load(configFile.toFile());
+            LOG.info("Config file loaded from " + configFile);
+
+            // Appling startup config
+            Config config = Config.getInstance();
+            MinecraftClientAccessor client = (MinecraftClientAccessor) MinecraftClient.getInstance();
+            client.setMultiplayerEnabled(config.MULTIPLAYER);
+            client.setOnlineChatEnabled(config.ONLINECHAT);
+
+            Config.getInstance().toFile(configFile.toFile());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void scarpetApi(CarpetExpression expression) {
+        ChatFunctions.apply(expression.getExpr());
+        FlySpeedFunctions.apply(expression.getExpr());
+    }
+
+    @Override
+    public String version() {
+        return MOD_ID;
+    }
+
+    @Override
+    public void onGameStarted() {
+        CarpetServer.settingsManager.parseSettingsClass(CarpetSchoolRules.class);
+        CarpetServer.settingsManager.getRule("commandScript").set(null, "ops");
+
+        CarpetScriptServer.registerSettingsApp(defaultScript("monomi", false));
+        CarpetScriptServer.registerSettingsApp(defaultScript("proporzioni", false));
+        CarpetScriptServer.registerSettingsApp(defaultScript("modulo", false));
+        CarpetScriptServer.registerSettingsApp(defaultScript("percentuali", false));
+        CarpetScriptServer.registerSettingsApp(defaultScript("basi", false));
+        CarpetScriptServer.registerSettingsApp(defaultScript("fattoriale", false));
+        CarpetScriptServer.registerSettingsApp(defaultScript("pigreco", false));
+    }
+
+    @Override
+    public void onServerLoaded(MinecraftServer server) {
+        reloadConfig();
+    }
+
     @Override
     public void onInitialize() {
         CarpetSchoolEvents.noop();
@@ -82,25 +104,5 @@ public class CarpetSchool implements CarpetExtension, ModInitializer {
     @Override
     public void onReload(MinecraftServer server) {
         reloadConfig();
-    }
-
-    public static void reloadConfig(){
-        try {
-            Path configDir = FabricLoader.getInstance().getConfigDir().normalize();
-            Files.createDirectories(configDir);
-            Path configFile = configDir.resolve("carpet-school.json").normalize();
-            Config.load(configFile.toFile());
-            LOG.info("Config file loaded from " + configFile);
-
-            // Appling startup config
-            Config config = Config.getInstance();
-            MinecraftClientAccessor client = (MinecraftClientAccessor)MinecraftClient.getInstance();
-            client.setMultiplayerEnabled(config.MULTIPLAYER);
-            client.setOnlineChatEnabled(config.ONLINECHAT);
-
-            Config.getInstance().toFile(configFile.toFile());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }
