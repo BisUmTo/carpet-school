@@ -88,40 +88,10 @@ global_primi = [1,2,3,5,7,11,13,17,19];
 _domanda() -> (
     _freeze();
     print('=====================================================');
-    print(format('b#ff0000 MATEMATICA CON MINECRAFT') +  ' #6.' + (global_domanda+=1));
+    print(format('b#ff0000 MATEMATICA CON MINECRAFT') +  ' #7.' + (global_domanda+=1));
     print(format('i Rispondi correttamente per ricevere un premio!\n'));
 
-    base_1 = floor(rand(8));
-    base_2 = floor(rand(base_1+1));
-    operazione = floor(rand(4));
-    if(operazione == 0 && base_1 < 5, // più
-        segno_operazione = '+';
-        global_risposta_corretta = fact(base_1) + fact(base_2);
-    , operazione == 1 && base_1 < 6, // meno
-        segno_operazione = '-';
-        global_risposta_corretta = fact(base_1) - fact(base_2);
-    , operazione == 2 && base_1 < 5, // per
-        segno_operazione = '·';
-        global_risposta_corretta = fact(base_1) * fact(base_2);
-    ,  // diviso
-        segno_operazione = ':';
-        global_risposta_corretta = fact(base_1) / fact(base_2);
-    );
-    print(str('Quanto vale %d! %s %d! ?',
-        base_1,
-        segno_operazione,
-        base_2
-    ));
 
-    r1 = fact(base_1)-fact(ceil(rand(base_1)));
-    if(r1 == global_risposta_corretta,
-        r1 += if(rand(2),1,-1)*(floor(rand(10))+1)
-    );
-
-    r2 = fact(base_2)*fact(ceil(rand(base_1)))^if(rand(2),1,-1);
-    while(r2 == global_risposta_corretta || r2 == r1 || !r2, 127,
-        r2 += if(rand(2),1,-1)*floor(rand(10))
-    );
 
     possibili_risposte = [global_risposta_corretta,r1];
     if(r2 != global_risposta_corretta && r2 != r1,
@@ -132,7 +102,7 @@ _domanda() -> (
     global_n_risposta_corretta = risposte_disordinate~global_risposta_corretta;
 
     for(risposte_disordinate,
-        print(format(' ' + global_lettere:_i, '!/fattoriale '+_i)+' '+format(' ? = '+_,'!/fattoriale '+_i)),
+        print(format(' ' + global_lettere:_i, '!/pigreco '+_i)+' '+format(' ? = '+_,'!/pigreco '+_i)),
     );
     print('=====================================================');
     global_countdown = system_info('world_time')
@@ -145,12 +115,14 @@ _risposta(risp) -> (
             // CORRETTA
             particle('happy_villager', pos(p)+[0,p~'eye_height',0]+p~'look');
             print(format('#00ff00 Esattamente! Ecco a te il tuo premio!'));
-            _add_max_health(p, global_quanto);
+            // TODO
+
+
         ,   // SBAGLIATA
             particle('wax_on', pos(p)+[0,p~'eye_height',0]+p~'look');
             print(format('#ffdd00 Accidenti! La risposta corretta era la '+global_lettere:global_n_risposta_corretta));
-            _add_max_health(p, -global_quanto);
-            modify(p,'health', min(_get_max_health(p), p~'health'))
+            // TODO
+
         );
         global_n_risposta_corretta = null;
     );
@@ -184,18 +156,9 @@ _unfreeze() -> (
 _unfreeze();
 
 // EVENTI
-__on_player_deals_damage(player, amount, entity) -> (
-    if(system_info('world_time')-global_countdown > global_time,
-        global_quanto = amount;
+global_blocchi = ['chest','crafting_table','furnace','blast_furnace','smoker','barrel','cartography_table'];
+__on_player_interacts_with_block(player, hand, block, face, hitvec) -> (
+    if(global_blocchi~block != null,
         _domanda()
-    );
-);
-
-__on_player_takes_damage(player, amount, source, source_entity) -> (
-    schedule(0,_(outer(amount),outer(player)) -> (
-        if(player~'health' > 0 && system_info('world_time')-global_countdown > global_time,
-            global_quanto = amount;
-            _domanda()
-        );
-    ))
-);
+    )
+)

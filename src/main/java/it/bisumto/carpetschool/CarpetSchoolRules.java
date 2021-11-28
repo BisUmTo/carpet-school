@@ -40,7 +40,7 @@ public class CarpetSchoolRules {
             appSource = "percentuali",
             category = {SURVIVAL, SCHOOL}
     )
-    public static boolean EP4_PERCENTUALI = false;
+    public static boolean EP4_PERCENTUALI = true;
 
     @Rule(
             desc = "Quando si piazza un blocco, viene mostrato un esercizio di cambio basi da risolvere.",
@@ -58,5 +58,14 @@ public class CarpetSchoolRules {
             appSource = "fattoriale",
             category = {SURVIVAL, SCHOOL}
     )
-    public static boolean EP6_FATTORIALE = true;
+    public static boolean EP6_FATTORIALE = false;
+
+    @Rule(
+            desc = "Quando un giocatore apre una cassa, viene mostrata un'operazione con pi greco.",
+            extra = {"Se si risponde correttamente, droppa un'armatura \"numerata\"",
+                    "Se la risposta dovesse essere errata, ti teletrasporta in una nuova dimensione."},
+            appSource = "pigreco",
+            category = {SURVIVAL, SCHOOL}
+    )
+    public static boolean EP7_PIGRECO = true;
 }
