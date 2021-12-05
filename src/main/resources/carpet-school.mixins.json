@@ -6,6 +6,7 @@
     "CreateWorldScreenMixin",
     "DebugHudMixin",
     "GameMenuScreenMixin",
+    "KeyboardInputMixin",
     "MinecraftClientAccessor",
     "MouseMixin",
     "PackScreenMixin",
