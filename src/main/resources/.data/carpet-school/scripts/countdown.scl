@@ -1,0 +1,12 @@
+// COUNTDOWN
+global_time = 300;
+global_countdown = system_info('world_time');
+_valid_time() -> (
+    global_countdown != null && system_info('world_time')-global_countdown > global_time
+);
+_start_countdown() -> (
+    global_countdown = system_info('world_time');
+);
+_stop_countdown() -> (
+    global_countdown = null;
+);
