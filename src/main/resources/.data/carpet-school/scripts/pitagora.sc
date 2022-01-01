@@ -1,8 +1,7 @@
 __config() -> {
     'commands' -> {
         '<risp>' -> '_risposta',
-        'skip' -> '_unfreeze',
-        'decimali <bool>' -> _(bool) -> global_decimali = bool
+        'skip' -> '_unfreeze'
     },
     'arguments' -> {
         'risp' -> {'type' -> 'int', 'min' -> 0, 'max' -> 2}
@@ -14,10 +13,13 @@ global_time = 300;
 global_countdown = system_info('world_time');
 global_domanda = 0;
 global_n_risposta_corretta = null;
+global_streak = 1;
+global_ultima = null;
 global_lettere = ['a)','b)','c)'];
 global_decimali = false;
 global_chest = null;
 global_chests = ['abandoned_mineshaft','bastion_bridge','bastion_hoglin_stable','bastion_other','bastion_treasure','buried_treasure','desert_pyramid','end_city_treasure','igloo_chest','jungle_temple','jungle_temple_dispenser','nether_bridge','pillager_outpost','ruined_portal','shipwreck_map','shipwreck_supply','shipwreck_treasure','simple_dungeon','spawn_bonus_chest','stronghold_corridor','stronghold_crossing','stronghold_library','underwater_ruin_big','underwater_ruin_small','village/village_armorer','village/village_butcher','village/village_cartographer','village/village_desert_house','village/village_fisher','village/village_fletcher','village/village_mason','village/village_plains_house','village/village_savanna_house','village/village_shepherd','village/village_snowy_house','village/village_taiga_house','village/village_tannery','village/village_temple','village/village_toolsmith','village/village_weaponsmith','woodland_mansion'];
+global_checkpoints = [];
 
 // UTILS
 _mcd(a,b) -> (
@@ -83,98 +85,42 @@ _attribute(entity, attribute, ...variables) -> (
 _get_max_health(player) -> _attribute(player, 'generic.max_health');
 _set_max_health(player, amount) -> _attribute(player, 'generic.max_health', amount);
 _add_max_health(player, amount) -> _attribute(player, 'generic.max_health', max(1,_attribute(player, 'generic.max_health') + amount));
-_coord(coordinate) -> (
-    'X: '+coordinate:0+
-    ', Y: '+coordinate:1+
-    ', Z: '+coordinate:2
+
+
+// ENCH
+_enchant(item_tuple, id, lvl) -> (
+    [item, count, nbt] = item_tuple;
+    if(!nbt, nbt = nbt('{}'));
+    if(!nbt:'Enchantments', nbt:'Enchantments' = nbt('[]'));
+    pnbt = parse_nbt(nbt);
+    pnbt:'Enchantments' += {'id' -> id, 'lvl' -> lvl};
+    [item, count, encode_nbt(pnbt)]
+);
+global_enchantments = ['aqua_affinity','bane_of_arthropods','binding_curse','blast_protection','channeling','depth_strider','efficiency','feather_falling','fire_aspect','fire_protection','flame','fortune','frost_walker','impaling','infinity','knockback','looting','loyalty','luck_of_the_sea','lure','mending','multishot','piercing','power','projectile_protection','protection','punch','quick_charge','respiration','riptide','sharpness','silk_touch','smite','soul_speed','sweeping','thorns','unbreaking','vanishing_curse'];
+_r_enchant(item_tuple) -> (
+    id = rand(global_enchantments);
+    lvl = floor(rand(10))+1;
+    _enchant(item_tuple, id, lvl)
 );
 
 // DOMANDA RISPOSTA
-global_primi = [1,2,3,5,7,11,13,17,19];
+global_terne = [[3,4,5],[5,12,13],[7,24,25],[8,15,17],[9,40,41],[11,60,61],[12,35,37],[13,84,85],[16,63,65],[20,21,29],[28,45,53],[33,56,65],[36,77,85],[39,80,89],[48,55,73],[65,72,97]];
 _domanda() -> (
     _freeze();
     print(player(),'=====================================================');
-    print(player(),format('b#ff0000 MATEMATICA CON MINECRAFT') +  ' #8.' + (global_domanda+=1));
+    print(player(),format('b#ff0000 MATEMATICA CON MINECRAFT') +  ' #9.' + (global_domanda+=1));
     print(player(),format('i Rispondi correttamente per ricevere un premio!\n'));
 
-    coordinate = map(pos(player()), round(_));
-    offset = map(range(3), if(rand(2),1,-1)*floor(rand(26))); // lista di 3 numeri da -25 a 25
-    coordinate_spostate = coordinate + offset;
-
-    es = floor(rand(3));
-    if(es == 0,
-        print(player(),format(
-            ' Ti trovi a coordinate ',
-            str('b %s\n',_coord(coordinate)),
-            ' Se percorri ',
-            str('b %d',offset:0),
-            '  blocchi sull\'asse delle ', 'b X', ' , ',
-            str('b %d', offset:1),
-            '  sull\'asse delle ', 'b Y', '  e ',
-            str('b %d', offset:2),
-            '  sull\'asse delle ', 'b Z', ' \n',
-            ' A che coordinate ti troverai?'
-        ));
-        global_risposta_corretta = coordinate_spostate;
-        r1 = coordinate - offset;
-        while(r1 == global_risposta_corretta, 127,
-            r1:floor(rand(3)) += if(rand(2),1,-1)*floor(rand(10))
-        );
-        r2 = coordinate + offset;
-        while(r2 == global_risposta_corretta || r2 == r1, 127,
-            r2:floor(rand(3)) += if(rand(2),1,-1)*floor(rand(10))
-        );
-        global_risposta_corretta = _coord(global_risposta_corretta);
-        r1 = _coord(r1);
-        r2 = _coord(r2);
-    , es == 1,
-        print(player(),format(
-            ' Ti trovi a coordinate ',
-            str('b %s\n',_coord(coordinate)),
-            ' Se vuoi arrivare a coordinate ',
-            str('b %s',_coord(coordinate_spostate))
-        ));
-        sottes = floor(rand(3));
-        if(sottes == 0,
-            print(player(),'Quanto ti devi muovere sull\'asse X?');
-            global_risposta_corretta = offset:0;
-            r2 = if(rand(2),1,-1)*offset:if(rand(2),1,2);
-        , sottes == 1,
-            print(player(),'Quanto ti devi muovere sull\'asse Y?');
-            global_risposta_corretta = offset:1;
-            r2 = if(rand(2),1,-1)*offset:if(rand(2),0,2);
-        , sottes == 2,
-            print(player(),'Quanto ti devi muovere sull\'asse Z?');
-            global_risposta_corretta = offset:2;
-            r2 = if(rand(2),1,-1)*offset:if(rand(2),0,1);
-        );
-        r1 = if(rand(2), -global_risposta_corretta, -r2);
-        while(r1 == global_risposta_corretta, 127,
-            r1 += if(rand(2),1,-1)*floor(rand(10))
-        );
-        while(r2 == global_risposta_corretta || r2 == r1, 127,
-            r2 += if(rand(2),1,-1)*floor(rand(10))
-        );
-    , es == 2,
-        print(player(),format(
-            ' Ti trovi a coordinate ',
-            str('b %s\n',_coord(coordinate_spostate)),
-            ' Se ti trovavi a coordinate ',
-            str('b %s\n',_coord(coordinate)),
-            ' Di quanto ti sei spostato?'
-        ));
-        global_risposta_corretta = offset;
-        r1 = map(range(3), if(rand(2),1,-1)*floor(rand(26)));
-        while(r1 == global_risposta_corretta, 127,
-            r1:floor(rand(3)) += if(rand(2),1,-1)*floor(rand(10))
-        );
-        r2 = map(range(3), if(rand(2),1,-1)*floor(rand(26)));
-        while(r2 == global_risposta_corretta || r2 == r1, 127,
-            r2:floor(rand(3)) += if(rand(2),1,-1)*floor(rand(10))
-        );
-        global_risposta_corretta = _coord(global_risposta_corretta);
-        r1 = _coord(r1);
-        r2 = _coord(r2);
+    terna = _shuffle(rand(global_terne));
+    print(player(), 'Completa la terna pitagorica:\n%d %d ...', terna);
+    global_risposta_corretta = terna:2;
+    r1 = terna:0 + if(rand(2),1,-1)*floor(rand(10));
+    while(r1 == global_risposta_corretta, 127,
+        r1 += if(rand(2),1,-1)*floor(rand(10))
+    );
+    r2 = terna:1 + if(rand(2),1,-1)*floor(rand(10));
+    while(r2 == global_risposta_corretta || r2 == r1, 127,
+        r2 += if(rand(2),1,-1)*floor(rand(10))
     );
 
     possibili_risposte = [global_risposta_corretta];
@@ -189,7 +135,7 @@ _domanda() -> (
     global_n_risposta_corretta = risposte_disordinate~global_risposta_corretta;
 
     for(risposte_disordinate,
-        print(player(),format(' ' + global_lettere:_i, '!/coordinate '+_i)+' '+format(' '+_,'!/coordinate '+_i)),
+        print(player(),format(' ' + global_lettere:_i, '!/pitagora '+_i)+' '+format(' '+_,'!/coordinate '+_i)),
     );
     print(player(),'=====================================================');
     global_countdown = system_info('world_time')
@@ -201,22 +147,46 @@ _risposta(risp) -> (
         if(risp == global_n_risposta_corretta,
             // CORRETTA
             particle('happy_villager', pos(p)+[0,p~'eye_height',0]+p~'look');
-            print(format('#00ff00 Esattamente! I controlli sono stati ripristinati!'));
-            run('carpet EP8_COORDINATE_DIR 0');
-            modify(p,'effect','speed',global_time+if(rand(2),1,-1)*floor(rand(300)),rand(10))
+            print(format('#00ff00 Esattamente! Ecco a te un fantastico premio!'));
+
+            if(global_ultima == true,
+                global_streak += 1,
+                global_ultima = true;
+                global_streak = 1;
+            );
+
+            if(global_streak > 4,
+                print(format('#00ff00 Hai risposto correttamente a '+global_streak+' domande consecutive!'));
+            );
+
+            loop(global_streak,
+                slot = floor(rand(inventory_size(p)));
+                item_tuple = inventory_get(p, slot);
+                if(item_tuple,
+                    item_tuple = _r_enchant(item_tuple);
+                    [item, count, nbt] = item_tuple;
+                    inventory_set(p, slot, count, item, nbt)
+                )
+            )
+
         ,   // SBAGLIATA
             particle('wax_on', pos(p)+[0,p~'eye_height',0]+p~'look');
             print(format('#ffdd00 Accidenti! La risposta corretta era la '+global_lettere:global_n_risposta_corretta));
-            dir = floor(rand(3)+1);
-            run('carpet EP8_COORDINATE_DIR '+dir);
-            if(dir == 1,
-                 print(format('#ff0000 Controlli ruotati in senso orario.'));
-            , dir == 2,
-                 print(format('#ff0000 Controlli invertiti.'));
-            , dir == 3,
-                 print(format('#ff0000 Controlli ruotati in senso anti-orario.'));
-            )
 
+            if(global_ultima == false,
+                global_streak += 1,
+                global_ultima = false;
+                global_streak = 1;
+            );
+
+            loop(global_streak,
+                delete(global_checkpoints:(-1));
+                if(length(global_checkpoints) > 0,
+                    global_pos:p = global_checkpoints:(-1),
+                    run(str('execute as %s at @s run spreadplayers ~ ~ 10 100 under 100 false @s', p));
+                    global_pos:p = pos(p);
+                )
+            )
         );
         global_n_risposta_corretta = null;
     );
@@ -253,6 +223,7 @@ _unfreeze();
 __on_tick() -> (
     if(system_info('world_time')-global_countdown > global_time,
         global_time = floor(rand(60)+30)*20;
+        global_checkpoints += pos(player());
         _domanda();
     )
 )

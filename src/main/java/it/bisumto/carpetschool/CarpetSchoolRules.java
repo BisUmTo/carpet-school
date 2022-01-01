@@ -76,7 +76,7 @@ public class CarpetSchoolRules {
             appSource = "coordinate",
             category = {SURVIVAL, SCHOOL}
     )
-    public static boolean EP8_COORDINATE = true;
+    public static boolean EP8_COORDINATE = false;
     @Rule(
             desc = "Regola ausiliaria per l'EP_8", category = {}
     )
@@ -84,10 +84,10 @@ public class CarpetSchoolRules {
 
 
     @Rule(
-            desc = "...",
-            extra = {"Se si risponde correttamente, ...",
-                    "Se la risposta dovesse essere errata, lo teletrasporta dove si trovava quando ha risposto alla domanda precedente."},
-            appSource = "coordinate",
+            desc = "Occasionalmente viene posto al giocatore una terna pitagorica",
+            extra = {"Se si risponde correttamente, vengono incantati oggetti a caso nell'inventario",
+                    "Se la risposta dovesse essere errata, lo teletrasporta dove si trovava quando ha risposto alla domanda precedente.\nSe ci si trova nel punto iniziale, si teletrasporta a caso nel mondo"},
+            appSource = "pitagora",
             category = {SURVIVAL, SCHOOL}
     )
     public static boolean EP9_PITAGORA = true;

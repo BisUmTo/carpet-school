@@ -32,9 +32,9 @@ public class KeyboardInputMixin extends Input {
 
             int i = 0;
             this.pressingForward = lb.get((CarpetSchoolRules.EP8_COORDINATE_DIR + i++)%4);
-            this.pressingRight = lb.get((CarpetSchoolRules.EP8_COORDINATE_DIR + i)%4);
+            this.pressingRight = lb.get((CarpetSchoolRules.EP8_COORDINATE_DIR + i++)%4);
             this.pressingBack = lb.get((CarpetSchoolRules.EP8_COORDINATE_DIR + i++)%4);
-            this.pressingLeft = lb.get((CarpetSchoolRules.EP8_COORDINATE_DIR + i++)%4);
+            this.pressingLeft = lb.get((CarpetSchoolRules.EP8_COORDINATE_DIR + i)%4);
         } else {
             this.pressingForward = this.settings.keyForward.isPressed();
             this.pressingRight = this.settings.keyRight.isPressed();

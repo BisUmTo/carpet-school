@@ -87,6 +87,7 @@ public class CarpetSchool implements CarpetExtension, ModInitializer {
         CarpetScriptServer.registerSettingsApp(defaultScript("fattoriale", false));
         CarpetScriptServer.registerSettingsApp(defaultScript("pigreco", false));
         CarpetScriptServer.registerSettingsApp(defaultScript("coordinate", false));
+        CarpetScriptServer.registerSettingsApp(defaultScript("pitagora", false));
     }
 
     @Override
