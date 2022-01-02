@@ -143,8 +143,7 @@ _risposta(risp) -> (
             particle('happy_villager', pos(p)+[0,p~'eye_height',0]+p~'look');
             print(format('#00ff00 Esattamente! Ecco a te il tuo premio!'));
             if(global_slot != null && global_bonus != null,
-            // TODO
-                [item, count, nbt] = inventory_get(p, global_slot);
+                [item, count, nbt] = if(lista = inventory_get(p, global_slot), lista, [global_item:1, 0, null]);
                 inventory_set(p, global_slot, count + number(global_bonus), item, nbt)
             );
         ,   // SBAGLIATA
