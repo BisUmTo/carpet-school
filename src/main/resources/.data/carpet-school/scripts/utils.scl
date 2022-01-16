@@ -18,3 +18,67 @@ _r_enchant(item_tuple) -> (
 _spreadplayers(player) -> (
     run(str('execute as %s at @s run spreadplayers ~ ~ 100 1000 under 100 false @s', player));
 );
+
+// RANDOM BLOCK AROUND
+global_forbidden_items = ['air','cave_air','void_air', 'infested_stone','nether_portal','fire'];
+global_deep = 0;
+_random_block_around(pos) -> (
+    blocks = {};
+    scan(pos,25,25,25,blocks += str(_));
+    for(global_forbidden_items, delete(blocks:_));
+    if(k = keys(blocks),
+        global_deep=0;
+        rand(k),
+       
+       global_deep > 50,
+        rand(['grass_block','stone']),
+        
+        pos1 = [pos:0+rand(100)-50,rand(32)+32,pos:2+rand(100)-50];
+        global_deep += 1;
+        _random_block_around(pos1);
+    )
+);
+
+// SHOW BLOCK IN ACTIONBAR
+_show_block_actionbar(player, block, text, color) -> (
+    item = if(
+        block=='lava','lava_bucket',
+        block=='water','water_bucket',
+        block=='tall_seagrass','seagrass',
+        block=='kelp_plan','kelp',
+        block
+    );
+    run(str('/title %s actionbar ["",{"text":"%s ","color":"%s"},{"translate":"carpet-school.%s","font":"carpet-school:icon"},{"text":" %s","color":"gray","italic":true}]',
+        player~'command_name',
+        text,
+        color,
+        item,
+        block
+    ))
+);
+_show_block_title(player, block) -> (
+    item = if(
+        block=='lava','lava_bucket',
+        block=='water','water_bucket',
+        block=='tall_seagrass','seagrass',
+        block=='kelp_plan','kelp',
+        block
+    );
+    run(str('/title %s title ["",{"translate":"carpet-school.%s","font":"carpet-school:icon"},{"text":" %s","color":"gray","italic":true}]',
+        player~'command_name',
+        item,
+        block
+    ))
+);
+
+// ARRAY UTIL
+_shuffle(l) -> (
+    loop((s=length(l))-1,
+        j = rand(s-_)+_;
+        t = l:_;
+        l:_ = l:j;
+        l:j = t
+    );
+    l
+);
+

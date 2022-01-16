@@ -1,0 +1,133 @@
+global_item = 'warped_fungus_on_a_stick';
+_totem_id(item, count, nbt) -> (
+    if(item == global_item && nbt,
+        parse_nbt(nbt):'CustomModelData',
+        null
+    )
+);
+_totem_use(player, hand) -> (
+    inventory_set(player, if(hand=='mainhand',player~'selected_slot',-1),0);
+    particle('totem_of_undying',pos(player)+[0,player~'eye_height',0],100,0.5,0.3);
+    sound('item.totem.use',pos(player))
+);
+
+global_totems = {
+    -1 -> [10, 'Totem del Villager'],
+    1 ->  [0,  'Totem del Pipistrello'],
+    2 ->  [10, 'Totem del Blaze'],
+    3 ->  [10, 'Totem del Creeper'],
+    4 ->  [10, 'Totem dell\\\\\\\'Enderman'],
+    5 ->  [0,  'Totem del Ghast'],
+    6 ->  [10, 'Totem del Guardiano'],
+    7 ->  [0,  'Totem dell\\\\\\\'Evocatore'],
+    8 ->  [10, 'Totem dello Shulker'],
+    9 ->  [0,  'Totem dello Slime'],
+    10 -> [10, 'Totem del Ragno'],
+    11 -> [0,  'Totem del Polpo'],
+    12 -> [0,  'Totem di Steve'],
+    13 -> [0,  'Totem del Wither'],
+    14 -> [10, 'Totem del Golem'],
+    15 -> [10, 'Totem della Strega'], 
+    16 -> [0,  'Totem del Piglin'] 
+};
+global_totem_chances = map(sort(keys(global_totems)),
+    [_, a += global_totems:_:0]
+);
+
+_give_random_totem(player) -> (
+    rand = rand(global_totem_chances:(-1):1);
+    id = null;
+    for(global_totem_chances,
+        if(_:1 >= rand, id = _:0; break())
+    );
+
+    if(id!=null,
+        spawn('item', pos(player), str('{Item:{id:"%s",Count:1,tag:{display:{Name:\'{"text":"%s","italic":false,"color":"yellow"}\'},CustomModelData:%d}}}',
+            if(id == -1, 'totem_of_undying',global_item),
+            global_totems:id,
+            id
+        )),
+    );
+);
+
+_on_player_uses_item(player, item_tuple, hand)->(
+    if(
+      // TOTEM DEL BLAZE
+       _totem_id(...(player~['holds',hand='mainhand']||[null,null,null]))==2 ||
+       _totem_id(...(player~['holds',hand='offhand']||[null,null,null]))==2,
+        _totem_use(player, hand);
+        modify(player,'may_fly',true);
+        modify(player,'effect','luck',600,0,true,false,false);
+        schedule(600, _(outer(player)) ->
+            if(player~'gamemode'=='survival',
+                modify(player,'may_fly',false)
+            )
+        )
+    , // TOTEM DEL CREEPER
+       _totem_id(...(player~['holds',hand='mainhand']||[null,null,null]))==3 ||
+       _totem_id(...(player~['holds',hand='offhand']||[null,null,null]))==3,
+        _totem_use(player, hand);
+        explostion_pos = player~['trace',10,'exact'] || pos(player)+[0,player~'eye_height',0]+player~'look'*10;
+        create_explosion(explostion_pos,5,'break',false,player,player);
+        modify(player,'effect','resistance',1,255,false,false,false);
+    , // TOTEM DELL'ENDERMAN
+       _totem_id(...(player~['holds',hand='mainhand']||[null,null,null]))==4 ||
+       _totem_id(...(player~['holds',hand='offhand']||[null,null,null]))==4,
+        players = player('all');
+        delete(players,players~player());
+        if(!length(players), players=entity_list('living'));
+        _totem_use(player, hand);
+        modify(player,'pos',pos(rand(players)));
+        _totem_use(player, hand);
+    , // TOTEM DEL GUARDIANO
+       _totem_id(...(player~['holds',hand='mainhand']||[null,null,null]))==6 ||
+       _totem_id(...(player~['holds',hand='offhand']||[null,null,null]))==6,
+        _totem_use(player, hand);
+        modify(player,'effect','night_vision',600,0);
+    , // TOTEM DEL RAGNO
+       _totem_id(...(player~['holds',hand='mainhand']||[null,null,null]))==10 ||
+       _totem_id(...(player~['holds',hand='offhand']||[null,null,null]))==10,
+        _totem_use(player, hand);
+        modify(player,'effect','speed',600,3);
+    , // TOTEM DEL GOLEM
+       _totem_id(...(player~['holds',hand='mainhand']||[null,null,null]))==14 ||
+       _totem_id(...(player~['holds',hand='offhand']||[null,null,null]))==14,
+        _totem_use(player, hand);
+        modify(player,'effect','strength',600,1);
+        modify(player,'effect','resistance',600,1);
+    , // TOTEM DELLA STREGA
+       _totem_id(...(player~['holds',hand='mainhand']||[null,null,null]))==15 ||
+       _totem_id(...(player~['holds',hand='offhand']||[null,null,null]))==15,
+        _totem_use(player, hand);
+        modify(player,'effect','invisibility',600,0);
+    );
+);
+
+// TOTEM DELLO SHULKER
+global_inventory = null;
+_on_player_dies(player)->(
+    if(_totem_id(...(player~['holds',hand='mainhand']||[null,null,null]))==8 || 
+       _totem_id(...(player~['holds',hand='offhand']||[null,null,null]))==8,
+        _totem_use(player, hand);
+        
+        global_inventory = [];
+        loop(inventory_size(player),
+            item_tuple = inventory_get(player, _) || [0, 0, 0];
+            [item, count, nbt] = item_tuple;
+            global_inventory:_ = [count, item, nbt];
+        );
+        pos = pos(player);
+        schedule(0, _(outer(pos)) -> 
+            run(str('kill @e[type=item,x=%d,y=%d,z=%d,distance=..3,nbt={Age:0s}]',pos))
+        )
+    )
+);
+_on_player_respawns(player)->(
+    if(global_inventory,
+        schedule(0,_(outer(player)) ->
+            loop(inventory_size(player),
+                inventory_set(player, _, ...global_inventory:_)
+            )
+        )
+    )
+)

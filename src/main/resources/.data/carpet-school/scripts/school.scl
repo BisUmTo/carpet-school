@@ -33,6 +33,13 @@ _unfreeze(player) -> if(player~['has_scoreboard_tag','bisumto.freeze'],
     modify(player,'clear_tag','bisumto.freeze')
 );
 
+_force_closing_screen(player) -> (
+    _unfreeze(player);
+    global_force_closing = true;
+    if(global_screen, close_screen(global_screen));
+    global_force_closing = false;
+);
+
 // GENERA DOMANDA
 genera_domanda_libera(player,domanda,risposta,success,fail) -> (
     global_n_domanda += 1;
@@ -95,7 +102,7 @@ _azioni_domanda(screen, player, action, data) -> (
     if(action == 'button' && data:'button' == 3, 
         'cancel';
     , action == 'close',
-        schedule(0, _(outer(screen),outer(player)) -> if(screen == global_screen,
+        schedule(0, _(outer(screen),outer(player)) -> if(screen == global_screen && !global_force_closing,
             //print(format('r CHIUSO'));
             _apri_domanda(player)
         ));
@@ -115,7 +122,7 @@ _azioni_risposta(screen, player, action, data) -> (
     , data:'slot' >= 3,
         _apri_domanda(player);
     , action == 'close',
-        schedule(0, _(outer(screen),outer(player)) -> if(screen == global_screen,
+        schedule(0, _(outer(screen),outer(player)) -> if(screen == global_screen && !global_force_closing,
             //print(format('r CHIUSO'));
             _apri_risposta(player)
         ));
@@ -134,7 +141,7 @@ _azioni_calcolatrice(screen, player, action, data) -> (
     if(data:'slot' >= 54,
         _apri_domanda(player);
     , action == 'close',
-        schedule(0, _(outer(screen),outer(player)) -> if(screen == global_screen,
+        schedule(0, _(outer(screen),outer(player)) -> if(screen == global_screen && !global_force_closing,
             //print(format('r CHIUSO'));
             _apri_calcolatrice(player)
         ));
@@ -641,7 +648,7 @@ call((global_calcolatrice = {
         number = number(global_calcolatrice:'display');
         if(number != null,
             if(global_calcolatrice:'expression_reset',
-                global_calcolatrice:'expression' = global_calcolatrice:'display';
+                global_calcolatrice:'expression' = '';
                 global_calcolatrice:'expression_reset' = false
             );
             global_calcolatrice:'expression' += number;
