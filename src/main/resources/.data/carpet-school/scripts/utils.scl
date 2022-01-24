@@ -39,6 +39,41 @@ _random_block_around(pos) -> (
     )
 );
 
+// RANDOM ITEM INVENTORY
+_random_item_inventory(p) -> (
+    items = {};
+    loop(inventory_size(p),
+        if(g = inventory_get(p,_),
+            items += g:0
+        )
+    );
+    if(k = keys(items), rand(k), null)
+);
+// RANDOM ITEM AROUND
+_random_item_around(player) -> (
+    items = [];
+    while(!items, 10,
+        items = _loot(_random_block_around(pos(player)))
+    );
+    item = if(items,
+        rand(items),
+        _random_item_inventory(player)
+    );
+    if(item,
+        item,
+        rand(item_list())
+    )
+);
+// loot of block
+_loot(block) -> (
+    pos = pos(player()) + [0,1000,0];
+    run(str('loot spawn %d %d %d loot minecraft:blocks/%s',...pos,block));
+    items = entity_area('item',pos,[1,1,1]);
+    ret = map(items,nbt=_~'nbt'; [nbt:'Item.id',nbt:'Item.Count',nbt:'Item.tag']);
+    for(items, modify(_,'remove'));
+    ret
+);
+
 // SHOW BLOCK IN ACTIONBAR
 _show_block_actionbar(player, block, text, color) -> (
     item = if(

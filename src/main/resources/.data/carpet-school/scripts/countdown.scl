@@ -1,5 +1,5 @@
 // COUNTDOWN
-global_time = 100;
+global_time = 600;
 global_start_time = system_info('world_time');
 
 _time() -> global_time+global_start_time-system_info('world_time');
