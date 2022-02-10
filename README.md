@@ -1,6 +1,7 @@
 # Carpet School
 
-Work in Progress mod that allows to create ingame quiz for Minecraft lessons.
+Work in Progress mod that allows to create ingame quiz for Minecraft lessons.<br/>
+Replaced by [scriptpacks/school](https://github.com/scriptpacks/school)
 
 <br/>
 
